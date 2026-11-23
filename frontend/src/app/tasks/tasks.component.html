@@ -1,0 +1,50 @@
+<section class="todo">
+  <h2>Ma liste de tâches</h2>
+
+  <form class="add-form" (ngSubmit)="addTask()">
+    <input
+      type="text"
+      name="newTitle"
+      placeholder="Saisir une nouvelle tâche…"
+      [(ngModel)]="newTitle"
+      autocomplete="off"
+    />
+    <button type="submit" [disabled]="!newTitle.trim()">Ajouter</button>
+  </form>
+
+  @if (error) {
+    <p class="error" role="alert">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="muted">Chargement…</p>
+  } @else if (tasks.length === 0) {
+    <p class="muted">Aucune tâche pour le moment. Ajoutez la première !</p>
+  } @else {
+    <ul class="task-list">
+      @for (task of tasks; track task._id) {
+        <li class="task" [class.done]="task.completed">
+          @if (editingId === task._id) {
+            <form class="edit-form" (ngSubmit)="saveEdit(task)">
+              <input type="text" name="editedTitle" [(ngModel)]="editedTitle" />
+              <button type="submit">Enregistrer</button>
+              <button type="button" class="ghost" (click)="cancelEdit()">Annuler</button>
+            </form>
+          } @else {
+            <input
+              type="checkbox"
+              [checked]="task.completed"
+              (change)="toggleCompleted(task)"
+              [attr.aria-label]="'Marquer « ' + task.title + ' » comme terminée'"
+            />
+            <span class="title">{{ task.title }}</span>
+            <span class="actions">
+              <button type="button" class="ghost" (click)="startEdit(task)">Modifier</button>
+              <button type="button" class="danger" (click)="deleteTask(task)">Supprimer</button>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>
